@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeTrack - Colegio de Montalban</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        cdmGreen: '#006837',
+                        cdmDarkGreen: '#004d28',
+                        cdmLightGreen: '#e8f5e9',
+                        cdmGold: '#FBB03B',
+                        cdmGoldDark: '#d9901e',
+                        navyBlue: '#1B365D',
+                        navyDark: '#0B192C',
+                        slateNavy: '#1E293B'
+                    },
+                    boxShadow: {
+                        'glow-green': '0 0 25px -5px rgba(0, 104, 55, 0.4)',
+                        'glow-gold': '0 0 25px -5px rgba(251, 176, 59, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome 6.5.1 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Smooth transitions & custom scrollbar */
+        * { -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-subtle { animation: pulseSubtle 2.5s infinite; }
+        @keyframes pulseSubtle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        /* Mobile Safe Area */
+        .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.5rem); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-cdmGreen selection:text-white">
+
+    <!-- ============================================================== -->
+    <!-- 1. ANIMATED INSTITUTIONAL SPLASH SCREEN                         -->
+    <!-- ============================================================== -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-gradient-to-br from-navyDark via-navyBlue to-cdmDarkGreen flex flex-col items-center justify-between p-6 text-white transition-opacity duration-700 ease-out">
+        <div class="w-full flex justify-end">
+            <button onclick="dismissSplash()" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition border border-white/20 text-slate-200">
+                Skip Intro <i class="fa-solid fa-angles-right ml-1"></i>
+            </button>
+        </div>
+
+        <div class="flex flex-col items-center text-center max-w-sm mx-auto my-auto slide-up">
+            <!-- Glowing Institutional Emblem -->
+            <div class="relative mb-6">
+                <div class="absolute -inset-2 bg-cdmGold/30 rounded-full blur-xl pulse-subtle"></div>
+                <div class="relative w-24 h-24 rounded-3xl bg-gradient-to-tr from-cdmGreen to-emerald-500 border-2 border-cdmGold flex items-center justify-center shadow-2xl">
+                    <i class="fa-solid fa-shield-halved text-5xl text-white drop-shadow"></i>
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-cdmGold text-navyDark font-black text-[10px] px-2 py-0.5 rounded-full border border-white uppercase tracking-wider">
+                    RA 10627
+                </div>
+            </div>
+
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-1">
+                Safe<span class="text-cdmGold">Track</span>
+            </h1>
+            <p class="text-xs uppercase font-bold tracking-widest text-emerald-300 mb-1">
+                Colegio de Montalban
+            </p>
+            <p class="text-[11px] text-slate-300 font-medium leading-relaxed max-w-xs">
+                Integrated Student Grievance, Anonymous Anti-Bullying Intake & Disciplinary Resolution Matrix
+            </p>
+
+            <!-- Loading Progress Indicator -->
+            <div class="w-56 mt-8 space-y-2">
+                <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden backdrop-blur-sm">
+                    <div id="splash-progress-bar" class="h-full bg-gradient-to-r from-cdmGold to-emerald-400 transition-all duration-1000 ease-out rounded-full" style="width: 15%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-300 font-mono">
+                    <span id="splash-status-text">Initializing DPA encryption...</span>
+                    <span id="splash-percent">15%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-[10px] text-slate-400 font-medium">
+            <p>Compliant with RA 10173 (Data Privacy) & RA 10627 (Anti-Bullying)</p>
+            <p class="text-slate-500">San Jose, Rodriguez, Rizal • Capstone 2026</p>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 2. TOAST NOTIFICATION CONTAINER                                 -->
+    <!-- ============================================================== -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[90] space-y-2 pointer-events-none max-w-xs w-full"></div>
+
+    <!-- ============================================================== -->
+    <!-- 3. TOP APP HEADER (RESPONSIVE)                                 -->
+    <!-- ============================================================== -->
+    <header class="bg-navyBlue text-white shadow-lg sticky top-0 z-40 border-b border-slate-700/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            
+            <!-- Branding -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="goToHome()">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cdmGreen to-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-md border border-emerald-400/30">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-base font-black tracking-tight">Safe<span class="text-cdmGold">Track</span></span>
+                        <span id="header-view-badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wide">
+                            Student SafeSpace
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-slate-300 truncate hidden xs:block">Colegio de Montalban</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls & Account Badge -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Quick Demo Switcher Button (Crucial for Defense) -->
+                <button onclick="openDemoSwitcherModal()" class="px-2.5 py-1.5 rounded-lg bg-cdmGold/20 hover:bg-cdmGold/30 text-cdmGold border border-cdmGold/40 text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span class="hidden sm:inline">Demo Switcher</span>
+                </button>
+
+                <!-- Current User Avatar / Auth Button -->
+                <div id="auth-header-slot">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================== -->
+    <!-- 4. MAIN CONTENT AREA (DYNAMIC DUAL VIEW: STUDENT vs ADMIN)     -->
+    <!-- ============================================================== -->
+    <main class="flex-grow w-full pb-safe md:pb-8">
+
+        <!-- ========================================================= -->
+        <!-- VIEW A: STUDENT & ANONYMOUS GUEST PORTAL                   -->
+        <!-- ========================================================= -->
+        <div id="student-portal-wrapper" class="block">
+            <!-- Student Desktop Tab Header (Hidden on Mobile, bottom nav used instead) -->
+            <div class="bg-white border-b border-slate-200 hidden md:block">
+                <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
+                    <div class="flex space-x-1 py-2">
+                        <button onclick="switchStudentTab('student-report')" id="tab-btn-student-report" class="student-nav-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 bg-cdmGreen text-white shadow-sm">
+                            <i class="fa-solid fa-file-pen"></i> Submit Incident
+                        </button>
+                        <button onclick="switchStudentTab('student-track')" id="tab-btn-student-track" class="student-nav-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                            <i class="fa-solid fa-magnifying-glass"></i> Live Case Telemetry
+                        </button>
+                        <button onclick="switchStudentTab('student-vault')" id="tab-btn-student-vault" class="student-nav-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                            <i class="fa-solid fa-vault"></i> My Saved Cases (<span id="vault-count-badge">0</span>)
+                        </button>
+                        <button onclick="switchStudentTab('student-policy')" id="tab-btn-student-policy" class="student-nav-btn px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                            <i class="fa-solid fa-scale-balanced"></i> RA 10627 & DPA Rights
+                        </button>
+                    </div>
+                    <!-- Student Profile Mini Chip -->
+                    <div id="student-chip-container" class="text-xs text-slate-500 font-medium"></div>
+                </div>
+            </div>
+
+            <!-- Student Mobile Notice Banner -->
+            <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+                <!-- 1. REPORT INCIDENT TAB -->
+                <section id="student-report" class="student-tab-pane block fade-in">
+                    <!-- Student Mode Profile Header (If logged in as Student) -->
+                    <div id="student-auth-banner" class="hidden mb-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img id="banner-student-avatar" src="" class="w-10 h-10 rounded-full border-2 border-cdmGreen object-cover">
+                            <div>
+                                <h3 id="banner-student-name" class="text-sm font-bold text-slate-800"></h3>
+                                <p id="banner-student-sub" class="text-xs text-slate-500"></p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-cdmGreen border border-emerald-300">
+                            <i class="fa-solid fa-shield-check mr-1"></i> Good Moral Standing
+                        </span>
+                    </div>
+
+                    <!-- Main Reporting Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-gradient-to-r from-navyBlue via-slate-800 to-cdmDarkGreen text-white p-5 sm:p-6">
+                            <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+                                <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 text-[11px] px-3 py-1 rounded-full font-semibold border border-emerald-500/30">
+                                    <i class="fa-solid fa-lock text-[10px]"></i> Zero-Knowledge Protected Portal
+                                </span>
+                                <span class="text-[11px] text-slate-300 font-mono">Form ID: CDM-IR-2026</span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black">Report a Concern, Bullying, or Violation</h2>
+                            <p class="text-xs text-slate-300 mt-1 max-w-xl">
+                                Protected under Republic Act 10627 (Anti-Bullying Act) and Republic Act 10173 (Data Privacy Act of 2012).
+                            </p>
+                        </div>
+
+                        <form id="incident-form" onsubmit="handleFormSubmit(event)" class="p-4 sm:p-6 space-y-5">
+                            
+                            <!-- Reporting Identity Mode -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    1. Reporting Identity Mode
+                                </label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label class="relative flex items-center p-3.5 border-2 rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition border-slate-200 has-[:checked]:border-cdmGreen has-[:checked]:bg-emerald-50/60 shadow-sm">
+                                        <input type="radio" name="reporting_mode" value="anonymous" checked onchange="toggleStudentFields(false)" class="text-cdmGreen focus:ring-cdmGreen h-4 w-4">
+                                        <div class="ml-3">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-xs font-bold text-slate-800">100% Anonymous Mode</span>
+                                                <i class="fa-solid fa-user-secret text-slate-400 text-xs"></i>
+                                            </div>
+                                            <span class="text-[11px] text-slate-500 block leading-tight">Zero student PII or credentials recorded.</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="relative flex items-center p-3.5 border-2 rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition border-slate-200 has-[:checked]:border-cdmGreen has-[:checked]:bg-emerald-50/60 shadow-sm">
+                                        <input type="radio" name="reporting_mode" value="identified" onchange="toggleStudentFields(true)" class="text-cdmGreen focus:ring-cdmGreen h-4 w-4">
+                                        <div class="ml-3">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-xs font-bold text-slate-800">Verified Student Mode</span>
+                                                <i class="fa-solid fa-id-card text-emerald-600 text-xs"></i>
+                                            </div>
+                                            <span class="text-[11px] text-slate-500 block leading-tight">Provide Student ID for official administrative callback.</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Verified Student Fields (Conditional) -->
+                            <div id="verified-fields" class="hidden grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 slide-up">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Student Number *</label>
+                                    <input type="text" id="student_id" placeholder="e.g., 2023-10293-CDM" class="w-full text-xs font-mono border-slate-300 rounded-lg p-2.5 border focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Institutional Email</label>
+                                    <input type="email" id="student_email" placeholder="student@cdm.edu.ph" class="w-full text-xs border-slate-300 rounded-lg p-2.5 border focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none">
+                                </div>
+                            </div>
+
+                            <!-- Category & Auto-Route Badge -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                        2. Incident Classification *
+                                    </label>
+                                    <select id="incident_category" required onchange="updateRoutingBadge()" class="w-full text-xs font-medium border-slate-300 rounded-xl p-3 border focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none bg-white">
+                                        <option value="" disabled selected>-- Select Incident Type --</option>
+                                        <option value="Bullying / Cyberbullying">Bullying / Cyberbullying (Confidential Intake)</option>
+                                        <option value="Student Handbook Violation">Student Handbook Infraction (Discipline)</option>
+                                        <option value="Academic Grievance">Academic / Faculty Grievance</option>
+                                        <option value="Campus Safety Concern">Campus Safety Hazard / Physical Altercation</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                        Automated Routing Destination
+                                    </label>
+                                    <div id="routing-badge" class="h-[46px] flex items-center px-3.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-500">
+                                        Select category to determine institutional routing
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Incident Date & Location -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                        3. Date & Approximate Time *
+                                    </label>
+                                    <input type="datetime-local" id="incident_date" required class="w-full text-xs border-slate-300 rounded-xl p-3 border focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                        4. Campus Location or Digital Platform *
+                                    </label>
+                                    <input type="text" id="incident_location" placeholder="e.g., 3F ICS Lab / Messenger GC" required class="w-full text-xs border-slate-300 rounded-xl p-3 border focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none bg-white">
+                                </div>
+                            </div>
+
+                            <!-- Narrative Description -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                        5. Detailed Incident Narrative *
+                                    </label>
+                                    <span class="text-[10px] text-slate-400">Do not mention your name if in anonymous mode</span>
+                                </div>
+                                <textarea id="incident_description" rows="4" required placeholder="Describe what transpired, persons involved, names of witnesses, and any immediate safety concerns..." class="w-full text-xs border-slate-300 rounded-xl p-3 border focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none bg-white leading-relaxed"></textarea>
+                            </div>
+
+                            <!-- Evidence Upload with EXIF Scrubbing simulation -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                    6. Digital Evidence Upload (Optional)
+                                </label>
+                                <label class="border-2 border-dashed border-slate-300 hover:border-cdmGreen rounded-xl p-4 text-center bg-slate-50 hover:bg-emerald-50/40 transition cursor-pointer flex flex-col items-center justify-center">
+                                    <i class="fa-solid fa-cloud-arrow-up text-cdmGreen text-2xl mb-1"></i>
+                                    <p class="text-xs text-slate-700 font-bold">Attach Photos, Screenshots, or Documents</p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">
+                                        <i class="fa-solid fa-shield-check text-emerald-600"></i> Automatic EXIF GPS & Device Metadata Sanitizer applied
+                                    </p>
+                                    <input type="file" id="evidence_file" class="hidden" onchange="showFileName(this)">
+                                    <div id="file-name-display" class="mt-2 text-xs font-bold text-cdmGreen"></div>
+                                </label>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="w-full bg-gradient-to-r from-cdmGreen to-emerald-700 hover:from-emerald-700 hover:to-cdmGreen text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2 text-xs uppercase tracking-wider">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Transmit Secure Encrypted Report</span>
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- 2. LIVE CASE TRACKER TAB -->
+                <section id="student-track" class="student-tab-pane hidden fade-in space-y-6">
+                    <!-- Search Input Card -->
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-navyBlue/10 text-navyBlue flex items-center justify-center">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-base sm:text-lg font-bold text-navyBlue">Incident Status Telemetry</h2>
+                                <p class="text-xs text-slate-500">Query real-time case progression using your 11-character Case Key.</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                            <div class="relative flex-grow">
+                                <input type="text" id="search-token" placeholder="Enter Case Key (e.g., ST-8291-CDM)" class="w-full text-xs font-mono border-slate-300 rounded-xl p-3.5 border uppercase tracking-wider focus:ring-2 focus:ring-cdmGreen focus:border-cdmGreen outline-none">
+                            </div>
+                            <button onclick="performSearch()" class="bg-navyBlue hover:bg-slate-800 text-white px-6 py-3.5 rounded-xl text-xs font-bold shadow transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-satellite-dish"></i>
+                                <span>Verify Status</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Result Output -->
+                    <div id="search-result-card" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden slide-up">
+                        <div class="p-5 sm:p-6 border-b border-slate-100 flex flex-wrap justify-between items-start gap-3 bg-gradient-to-r from-slate-50 to-white">
+                            <div>
+                                <span id="res-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"></span>
+                                <h3 id="res-key" class="text-lg sm:text-xl font-bold text-navyBlue font-mono mt-2"></h3>
+                                <p id="res-category" class="text-xs font-semibold text-slate-600"></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Assigned Bureau</span>
+                                <span id="res-dept" class="text-xs font-bold text-navyBlue bg-slate-100 px-2.5 py-1 rounded-lg inline-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <!-- Progression Stepper (Responsive) -->
+                        <div class="p-5 sm:p-6 bg-slate-50/60 border-b border-slate-100">
+                            <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">Case Lifecycle Timeline</h4>
+                            <div class="grid grid-cols-4 gap-1 sm:gap-2 text-center relative">
+                                <!-- Step 1 -->
+                                <div class="flex flex-col items-center step-node" id="step-1">
+                                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold bg-slate-200 text-slate-600 mb-1 step-circle transition-all">1</div>
+                                    <span class="text-[10px] font-semibold text-slate-600">Submitted</span>
+                                </div>
+                                <!-- Step 2 -->
+                                <div class="flex flex-col items-center step-node" id="step-2">
+                                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold bg-slate-200 text-slate-600 mb-1 step-circle transition-all">2</div>
+                                    <span class="text-[10px] font-semibold text-slate-600">Under Review</span>
+                                </div>
+                                <!-- Step 3 -->
+                                <div class="flex flex-col items-center step-node" id="step-3">
+                                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold bg-slate-200 text-slate-600 mb-1 step-circle transition-all">3</div>
+                                    <span class="text-[10px] font-semibold text-slate-600">In Mediation</span>
+                                </div>
+                                <!-- Step 4 -->
+                                <div class="flex flex-col items-center step-node" id="step-4">
+                                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold bg-slate-200 text-slate-600 mb-1 step-circle transition-all">4</div>
+                                    <span class="text-[10px] font-semibold text-slate-600">Resolved</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Incident Summary & Official Action -->
+                        <div class="p-5 sm:p-6 space-y-4">
+                            <div>
+                                <h5 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reported Incident Summary</h5>
+                                <p id="res-desc" class="text-xs text-slate-700 mt-1 italic leading-relaxed"></p>
+                            </div>
+                            
+                            <div class="p-4 bg-emerald-50/70 rounded-xl border border-emerald-200">
+                                <h5 class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-info"></i> Official Action / Guidance Remarks
+                                </h5>
+                                <p id="res-remarks" class="text-xs text-emerald-950 mt-1.5 leading-relaxed font-medium"></p>
+                            </div>
+
+                            <!-- Two-Way Anonymous Relay Communication Box -->
+                            <div class="border-t border-slate-100 pt-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h5 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-comments text-cdmGreen"></i> Anonymous Investigator Channel
+                                    </h5>
+                                    <span class="text-[10px] text-slate-400">Zero-identity 2-way relay</span>
+                                </div>
+                                
+                                <div id="res-chat-thread" class="space-y-2 max-h-48 overflow-y-auto p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                                    <!-- Messages populated dynamically -->
+                                </div>
+
+                                <div class="mt-3 flex gap-2">
+                                    <input type="text" id="chat-reply-input" placeholder="Type a clarification or response without revealing identity..." class="flex-grow text-xs border-slate-300 rounded-lg p-2.5 border outline-none focus:ring-2 focus:ring-cdmGreen">
+                                    <button onclick="sendStudentReply()" class="bg-cdmGreen hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="no-result" class="hidden text-center p-8 bg-white rounded-2xl border border-slate-200 fade-in">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-3xl mb-2"></i>
+                        <p class="text-xs font-bold text-slate-700">Invalid Tracking Token</p>
+                        <p class="text-[11px] text-slate-500 mt-1">No case registered under this key. Please check capital letters and dashes.</p>
+                    </div>
+                </section>
+
+                <!-- 3. MY SAVED CASES (DEVICE VAULT) TAB -->
+                <section id="student-vault" class="student-tab-pane hidden fade-in space-y-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <div>
+                                <h3 class="text-base font-bold text-navyBlue">My Case Key Vault</h3>
+                                <p class="text-xs text-slate-500">Case keys generated on this browser are stored locally so you never lose track.</p>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-cdmGreen bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                                Local Storage Active
+                            </span>
+                        </div>
+                        <div id="vault-list" class="divide-y divide-slate-100 text-xs">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. STUDENT RIGHTS & POLICY TAB -->
+                <section id="student-policy" class="student-tab-pane hidden fade-in space-y-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5 text-xs">
+                        <div>
+                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest block mb-1">Legal Safeguards</span>
+                            <h3 class="text-lg font-bold text-navyBlue">Your Rights Under Republic Acts</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-xl bg-purple-50/70 border border-purple-200">
+                                <h4 class="font-bold text-purple-900 text-xs mb-1 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-hand-holding-heart"></i> RA 10627: Anti-Bullying Act of 2013
+                                </h4>
+                                <p class="text-purple-950 text-[11px] leading-relaxed">
+                                    Mandates non-punitive guidance counseling, strict confidentiality of victim and reporter identities, protection against retaliation, and immediate 24-48 hour institutional response.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-200">
+                                <h4 class="font-bold text-blue-900 text-xs mb-1 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-shield"></i> RA 10173: Data Privacy Act of 2012
+                                </h4>
+                                <p class="text-blue-950 text-[11px] leading-relaxed">
+                                    Guarantees the principle of Data Minimization. You have the statutory right to report campus hazards and grievances without being forced to reveal personal identifiable information (PII).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-slate-800 text-xs mb-1">Colegio de Montalban Handbook Violations Reference</h4>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-600 text-[11px]">
+                                <li><strong>Minor Offenses:</strong> Uniform infractions, failure to display ID, loitering during class hours (Managed by Prefect).</li>
+                                <li><strong>Major Offenses:</strong> Cyberbullying, hazing, extortion, academic dishonesty, physical assault (Joint Committee hearing).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- VIEW B: ADMINISTRATIVE RESOLUTION CENTER (DISTINCT UI)   -->
+        <!-- ========================================================= -->
+        <div id="admin-portal-wrapper" class="hidden">
+            
+            <!-- Admin Top Metric KPI Bar -->
+            <div class="bg-gradient-to-r from-navyDark via-navyBlue to-slate-900 text-white border-b border-slate-700 py-6 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span id="admin-badge-role" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cdmGold text-navyDark uppercase tracking-wider">
+                                    Prefect of Discipline
+                                </span>
+                                <span class="text-xs text-slate-300">Executive Disciplinary & Counseling Desk</span>
+                            </div>
+                            <h2 class="text-2xl font-black mt-1" id="admin-welcome-title">Command Center Console</h2>
+                            <p class="text-xs text-slate-300">Colegio de Montalban Office of Student Affairs & Services</p>
+                        </div>
+
+                        <!-- Quick Role Switch Dropdown for Demo -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-semibold text-slate-300">Active Officer Profile:</label>
+                            <select id="admin-role-fast-switch" onchange="handleAdminRoleSwitch(this.value)" class="text-xs font-bold bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 outline-none">
+                                <option value="prefect">Prefect of Discipline (Atty. Bautista)</option>
+                                <option value="guidance">Guidance Counselor (Dr. Cruz)</option>
+                                <option value="admin">System Administrator (Engr. Delgado)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 4 Metric Cards -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 border border-white/10">
+                            <span class="text-[10px] font-bold uppercase text-slate-300 tracking-wider block">Total Intake</span>
+                            <div class="flex justify-between items-end mt-1">
+                                <span class="text-2xl font-black text-white" id="stat-total-cases">0</span>
+                                <i class="fa-solid fa-folder-open text-cdmGold text-xl opacity-80"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 border border-white/10">
+                            <span class="text-[10px] font-bold uppercase text-amber-300 tracking-wider block">Under Review / Triage</span>
+                            <div class="flex justify-between items-end mt-1">
+                                <span class="text-2xl font-black text-amber-400" id="stat-pending-cases">0</span>
+                                <i class="fa-solid fa-hourglass-half text-amber-400 text-xl opacity-80"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 border border-white/10">
+                            <span class="text-[10px] font-bold uppercase text-purple-300 tracking-wider block">In Hearing / Mediation</span>
+                            <div class="flex justify-between items-end mt-1">
+                                <span class="text-2xl font-black text-purple-400" id="stat-active-hearings">0</span>
+                                <i class="fa-solid fa-scale-balanced text-purple-400 text-xl opacity-80"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 border border-white/10">
+                            <span class="text-[10px] font-bold uppercase text-emerald-300 tracking-wider block">Resolved Cases</span>
+                            <div class="flex justify-between items-end mt-1">
+                                <span class="text-2xl font-black text-emerald-400" id="stat-resolved-cases">0</span>
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-xl opacity-80"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Navigation Tabs & Filters -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <!-- Admin Tab Pills -->
+                    <div class="flex flex-wrap gap-1">
+                        <button onclick="switchAdminTab('admin-cases')" id="btn-admin-cases" class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition bg-navyBlue text-white shadow">
+                            <i class="fa-solid fa-list-check mr-1.5"></i> Active Incident Queue
+                        </button>
+                        <button onclick="switchAdminTab('admin-demerits')" id="btn-admin-demerits" class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-slate-100">
+                            <i class="fa-solid fa-gavel mr-1.5"></i> Prefect Demerit Blotter
+                        </button>
+                        <button onclick="switchAdminTab('admin-guidance-desk')" id="btn-admin-guidance" class="admin-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-slate-100">
+                            <i class="fa-solid fa-heart-pulse mr-1.5"></i> Guidance Welfare (RA 10627)
+                        </button>
+                    </div>
+
+                    <!-- Department View Filter -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-xs font-bold text-slate-500 whitespace-nowrap">Filter Bureau:</label>
+                        <select id="admin-dept-filter" onchange="renderAdminTable()" class="text-xs font-bold border-slate-300 rounded-lg p-2 bg-slate-50 outline-none w-full sm:w-auto">
+                            <option value="ALL">All Campus Cases</option>
+                            <option value="Guidance and Counseling Office">Guidance & Counseling (Bullying)</option>
+                            <option value="Office of the Prefect of Discipline">Prefect of Discipline (Violations)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SUB-PANE 1: ACTIVE INCIDENT QUEUE -->
+                <section id="pane-admin-cases" class="admin-pane block fade-in">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        
+                        <!-- Search & Urgency Filter Bar -->
+                        <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row gap-3 justify-between items-center bg-slate-50/60">
+                            <div class="relative w-full sm:w-72">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" id="admin-search-input" oninput="renderAdminTable()" placeholder="Search key, location, keyword..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-navyBlue">
+                            </div>
+
+                            <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 w-full sm:w-auto justify-end">
+                                <span>Status:</span>
+                                <select id="admin-status-filter" onchange="renderAdminTable()" class="text-xs border border-slate-300 rounded-lg p-2 bg-white">
+                                    <option value="ALL">All Stages</option>
+                                    <option value="Submitted">Submitted (Intake)</option>
+                                    <option value="Under Review">Under Review</option>
+                                    <option value="In Mediation">In Mediation</option>
+                                    <option value="Resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Desktop Table View -->
+                        <div class="hidden md:block overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                                        <th class="p-4">Case Key</th>
+                                        <th class="p-4">Category & Location</th>
+                                        <th class="p-4">Assigned Unit</th>
+                                        <th class="p-4">Mode / Identity</th>
+                                        <th class="p-4">Lifecycle Status</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-table-body" class="divide-y divide-slate-100 text-xs">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mobile Card View (Optimized for Mobile Screens) -->
+                        <div id="admin-mobile-card-list" class="md:hidden divide-y divide-slate-100 p-3 space-y-3">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SUB-PANE 2: PREFECT DEMERIT BLOTTER -->
+                <section id="pane-admin-demerits" class="admin-pane hidden fade-in space-y-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-navyBlue">Office of the Prefect of Discipline Blotter</h3>
+                                <p class="text-xs text-slate-500">Official student handbook demerits and sanction execution registry.</p>
+                            </div>
+                            <span class="text-xs font-bold px-3 py-1 bg-blue-50 text-blue-800 rounded-lg border border-blue-200">
+                                Official Student Jacket System
+                            </span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b text-[11px] font-bold uppercase text-slate-600">
+                                        <th class="p-3">Student Number</th>
+                                        <th class="p-3">Student Name</th>
+                                        <th class="p-3">Program & Year</th>
+                                        <th class="p-3">Offense / Violation</th>
+                                        <th class="p-3">Demerit Points</th>
+                                        <th class="p-3">Prescribed Sanction</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="demerits-table-body" class="divide-y divide-slate-100">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SUB-PANE 3: GUIDANCE COUNSELING & ANTI-BULLYING DESK -->
+                <section id="pane-admin-guidance-desk" class="admin-pane hidden fade-in space-y-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-purple-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-lock text-purple-700"></i> RA 10627 Anti-Bullying Confidential Desk
+                                </h3>
+                                <p class="text-xs text-slate-500">Restricted access under RGC ethics and Data Privacy Act of 2012.</p>
+                            </div>
+                            <span class="text-xs font-bold px-3 py-1 bg-purple-50 text-purple-800 rounded-lg border border-purple-200">
+                                RGC License Verified
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="p-4 rounded-xl bg-purple-50/60 border border-purple-200 text-xs">
+                                <span class="font-bold text-purple-900 block mb-1">Mediation Protocols</span>
+                                <p class="text-purple-950 text-[11px]">Non-adversarial conflict resolution conducted by a licensed Guidance Counselor.</p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 text-xs">
+                                <span class="font-bold text-emerald-900 block mb-1">Psychological Safety</span>
+                                <p class="text-emerald-950 text-[11px]">Strict pseudonymity for reporters to prevent peer retaliation.</p>
+                            </div>
+                            <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-200 text-xs">
+                                <span class="font-bold text-amber-900 block mb-1">DepEd / CHED Compliance</span>
+                                <p class="text-amber-950 text-[11px]">Annual statistical reporting without exposing student identifiers.</p>
+                            </div>
+                        </div>
+
+                        <div id="guidance-confidential-cases" class="space-y-3 text-xs">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================== -->
+    <!-- 5. MOBILE BOTTOM NAVIGATION (STUDENT PORTAL ONLY)             -->
+    <!-- ============================================================== -->
+    <nav id="student-mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-2xl flex justify-around items-center h-16 px-2">
+        <button onclick="switchStudentTab('student-report')" id="mob-btn-report" class="flex flex-col items-center justify-center flex-1 py-1 text-cdmGreen font-bold transition">
+            <i class="fa-solid fa-file-pen text-base mb-1"></i>
+            <span class="text-[10px]">Report</span>
+        </button>
+        <button onclick="switchStudentTab('student-track')" id="mob-btn-track" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-cdmGreen transition">
+            <i class="fa-solid fa-magnifying-glass text-base mb-1"></i>
+            <span class="text-[10px]">Tracker</span>
+        </button>
+        <button onclick="switchStudentTab('student-vault')" id="mob-btn-vault" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-cdmGreen transition relative">
+            <i class="fa-solid fa-vault text-base mb-1"></i>
+            <span class="text-[10px]">My Keys</span>
+            <span id="mob-vault-dot" class="hidden absolute top-2 right-6 w-2 h-2 rounded-full bg-cdmGold"></span>
+        </button>
+        <button onclick="switchStudentTab('student-policy')" id="mob-btn-policy" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-cdmGreen transition">
+            <i class="fa-solid fa-scale-balanced text-base mb-1"></i>
+            <span class="text-[10px]">Rights</span>
+        </button>
+    </nav>
+
+    <!-- ============================================================== -->
+    <!-- 6. MODALS & DIALOGS                                            -->
+    <!-- ============================================================== -->
+
+    <!-- MODAL A: CASE KEY CONFIRMATION (STUDENT RECEIPT) -->
+    <div id="token-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 slide-up">
+            <div class="w-14 h-14 bg-emerald-100 text-cdmGreen rounded-2xl flex items-center justify-center mx-auto text-2xl mb-4 border border-emerald-300">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-xl font-black text-navyBlue">Incident Successfully Filed</h3>
+            <p class="text-xs text-slate-500 mt-2">
+                Your report has been encrypted and assigned to the proper bureau. If you elected Anonymous Mode, this <strong>Case Key</strong> is the <u>only</u> key to verify status or communicate.
+            </p>
+            
+            <div class="bg-slate-100 border border-slate-200 rounded-xl p-3.5 my-4 flex items-center justify-between">
+                <span id="modal-token-display" class="font-mono text-lg font-black text-cdmGreen tracking-wider"></span>
+                <button onclick="copyTokenToClipboard()" class="text-xs bg-white border border-slate-300 hover:bg-slate-50 px-3 py-1.5 rounded-lg font-bold text-slate-700 shadow-sm flex items-center gap-1">
+                    <i class="fa-regular fa-copy"></i> <span>Copy</span>
+                </button>
+            </div>
+
+            <p class="text-[11px] text-amber-700 font-semibold mb-5 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Saved automatically into your browser's "My Keys" vault.
+            </p>
+
+            <button onclick="closeTokenModal()" class="w-full bg-navyBlue hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow">
+                Done & View Live Telemetry
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL B: ADMIN CASE ADJUDICATION & STAGE UPDATE -->
+    <div id="admin-action-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-100 slide-up max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                <div>
+                    <h3 class="text-base font-bold text-navyBlue">Adjudicate / Action Case</h3>
+                    <p class="text-[11px] text-slate-400 font-mono" id="modal-case-header-key"></p>
+                </div>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="edit-case-key">
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Lifecycle Status Stage</label>
+                    <select id="edit-case-status" class="w-full border-slate-300 rounded-xl p-2.5 text-xs border font-semibold outline-none focus:ring-2 focus:ring-navyBlue bg-white">
+                        <option value="Submitted">Step 1: Submitted (Initial Intake)</option>
+                        <option value="Under Review">Step 2: Under Review / Preliminary Triage</option>
+                        <option value="In Mediation">Step 3: In Hearing / Guidance Mediation</option>
+                        <option value="Resolved">Step 4: Resolved / Closed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Transfer / Reassign Bureau</label>
+                    <select id="edit-case-dept" class="w-full border-slate-300 rounded-xl p-2.5 text-xs border font-semibold outline-none focus:ring-2 focus:ring-navyBlue bg-white">
+                        <option value="Guidance and Counseling Office">Guidance & Counseling Office (Bullying)</option>
+                        <option value="Office of the Prefect of Discipline">Office of the Prefect of Discipline (Handbook)</option>
+                        <option value="Office of Student Affairs">Office of Student Affairs (General)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Official Resolution / Guidance Remarks (Public to Reporter)</label>
+                    <textarea id="edit-case-remarks" rows="3" class="w-full border-slate-300 rounded-xl p-2.5 text-xs border outline-none focus:ring-2 focus:ring-navyBlue" placeholder="Enter formal resolution findings, counseling session notes, or disciplinary sanction..."></textarea>
+                </div>
+
+                <!-- Two-Way Investigator Relay in Modal -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <label class="block font-bold text-slate-700 mb-1">Post Two-Way Anonymous Message to Student</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="admin-reply-input" placeholder="Ask student for clarification without revealing their identity..." class="flex-grow text-xs border-slate-300 rounded-lg p-2 border outline-none">
+                        <button onclick="sendAdminRelayMessage()" class="bg-navyBlue text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-slate-800 transition">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t">
+                    <button onclick="closeAdminModal()" class="px-4 py-2.5 border border-slate-300 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 text-xs">
+                        Cancel
+                    </button>
+                    <button onclick="saveAdminAction()" class="px-5 py-2.5 bg-cdmGreen hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow">
+                        Commit Case Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL C: LOGIN DIALOG WITH 1-CLICK DUMMY ACCOUNTS -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 slide-up max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-cdmGreen text-white flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-navyBlue">Colegio de Montalban Sign In</h3>
+                </div>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Standard Credentials Form -->
+            <form id="login-form" onsubmit="handleManualLogin(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Institutional Email or Student ID</label>
+                    <input type="text" id="login-email" required placeholder="e.g. student@cdm.edu.ph or prefect@cdm.edu.ph" class="w-full border-slate-300 rounded-xl p-3 border outline-none focus:ring-2 focus:ring-cdmGreen">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full border-slate-300 rounded-xl p-3 border outline-none focus:ring-2 focus:ring-cdmGreen">
+                </div>
+                <button type="submit" class="w-full bg-navyBlue hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition">
+                    Sign In with Credentials
+                </button>
+            </form>
+
+            <!-- 1-Click Fast Switcher (For Capstone Panel Defense) -->
+            <div class="mt-6 pt-5 border-t border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Panel Defense 1-Click Fast Switch</span>
+                    <span class="text-[10px] text-cdmGreen font-bold bg-emerald-50 px-2 py-0.5 rounded-full">Instant Login</span>
+                </div>
+                <div class="grid grid-cols-1 gap-2">
+                    <!-- Student -->
+                    <button onclick="loginAs('student')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-cdmGreen hover:bg-emerald-50/50 transition flex items-center justify-between group">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-cdmGreen flex items-center justify-center font-bold text-xs">
+                                🎓
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-800 text-xs block group-hover:text-cdmGreen">Maria Santos (Student)</span>
+                                <span class="text-[10px] text-slate-400">BSIT 3-A • 2023-10293-CDM</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-emerald-700 bg-white px-2 py-1 rounded border shadow-sm">Student UI</span>
+                    </button>
+
+                    <!-- Prefect -->
+                    <button onclick="loginAs('prefect')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-600 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                                ⚖️
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-800 text-xs block group-hover:text-blue-700">Atty. Ronald Bautista (Prefect)</span>
+                                <span class="text-[10px] text-slate-400">Office of the Prefect of Discipline</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-blue-700 bg-white px-2 py-1 rounded border shadow-sm">Admin UI</span>
+                    </button>
+
+                    <!-- Guidance -->
+                    <button onclick="loginAs('guidance')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-purple-600 hover:bg-purple-50/50 transition flex items-center justify-between group">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
+                                🕊️
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-800 text-xs block group-hover:text-purple-700">Dr. Elena Cruz, RGC (Counselor)</span>
+                                <span class="text-[10px] text-slate-400">Guidance & Counseling (Anti-Bullying)</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-purple-700 bg-white px-2 py-1 rounded border shadow-sm">Admin UI</span>
+                    </button>
+
+                    <!-- Anonymous Guest -->
+                    <button onclick="loginAs('guest')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-slate-400 hover:bg-slate-100 transition flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs">
+                                🕵️
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-700 text-xs block">Anonymous Guest Mode</span>
+                                <span class="text-[10px] text-slate-400">Zero credentials • Student SafeSpace</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-600 bg-white px-2 py-1 rounded border shadow-sm">Guest</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 7. APPLICATION LOGIC & MOCK DATA CONTROLLER                     -->
+    <!-- ============================================================== -->
+    <script>
+        // Pre-configured Institutional Accounts
+        const DUMMY_ACCOUNTS = {
+            student: {
+                role: 'STUDENT',
+                id: '2023-10293-CDM',
+                email: 'student@cdm.edu.ph',
+                name: 'Maria C. Santos',
+                dept: 'Institute of Computer Studies',
+                program: 'BS Information Technology (BSIT 3-A)',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+                badge: 'Student Leader',
+                demerits: 0
+            },
+            prefect: {
+                role: 'ADMIN_PREFECT',
+                id: 'EMP-POD-004',
+                email: 'prefect@cdm.edu.ph',
+                name: 'Atty. Ronald Bautista',
+                dept: 'Office of the Prefect of Discipline',
+                badge: 'Chief Disciplinary Officer',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
+            },
+            guidance: {
+                role: 'ADMIN_GUIDANCE',
+                id: 'EMP-GCO-012',
+                email: 'guidance@cdm.edu.ph',
+                name: 'Dr. Elena M. Cruz, RGC',
+                dept: 'Guidance and Counseling Office',
+                badge: 'Registered Guidance Counselor',
+                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
+            },
+            admin: {
+                role: 'SUPER_ADMIN',
+                id: 'EMP-SYS-001',
+                email: 'admin@cdm.edu.ph',
+                name: 'Engr. Mark Delgado',
+                dept: 'MIS / Institute of Computer Studies',
+                badge: 'System Administrator',
+                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80'
+            }
+        };
+
+        // Seed Institutional Incident Records
+        const INITIAL_RECORDS = [
+            {
+                key: "ST-8291-CDM",
+                category: "Bullying / Cyberbullying",
+                dept: "Guidance and Counseling Office",
+                mode: "anonymous",
+                date: "2026-10-28T09:30",
+                location: "Online / Messenger Group Chat",
+                desc: "Repeated cyber harassment, public ridicule, and intimidation targeting 2nd year students during capstone groupings.",
+                status: "In Mediation",
+                remarks: "Guidance Counselor Dr. Cruz has opened confidential case jacket. Mediation conference scheduled under full victim pseudonymity.",
+                messages: [
+                    { sender: "INVESTIGATOR", text: "Notice from Guidance: We have scheduled a non-adversarial session. Are you comfortable with an online session?", time: "10:00 AM" },
+                    { sender: "STUDENT", text: "Yes Dr. Cruz, as long as my identity is protected under RA 10627.", time: "10:15 AM" },
+                    { sender: "INVESTIGATOR", text: "Guaranteed. Full pseudonymity is enforced.", time: "10:20 AM" }
+                ]
+            },
+            {
+                key: "ST-3104-CDM",
+                category: "Student Handbook Violation",
+                dept: "Office of the Prefect of Discipline",
+                mode: "identified",
+                studentId: "2024-0012-CDM",
+                studentName: "Juan Dela Cruz",
+                date: "2026-10-27T14:15",
+                location: "Main Building Gate 1",
+                desc: "Repeated uniform policy violation and refusing campus security identification check.",
+                status: "Resolved",
+                remarks: "First written warning logged on student discipline jacket. 2 hours of campus library service served.",
+                messages: []
+            },
+            {
+                key: "ST-9542-CDM",
+                category: "Campus Safety Concern",
+                dept: "Office of the Prefect of Discipline",
+                mode: "anonymous",
+                date: "2026-10-29T11:00",
+                location: "3rd Floor Science Laboratory",
+                desc: "Faulty electrical wiring and exposed socket causing spark near water container.",
+                status: "Submitted",
+                remarks: "Incident intake registered. Dispatched facilities inspection team.",
+                messages: []
+            }
+        ];
+
+        // Seed Demerit Records for Prefect Blotter
+        const INITIAL_DEMERITS = [
+            { id: "2024-0012-CDM", name: "Juan Dela Cruz", program: "BSBA 2-B", offense: "Article 4.2: Dress Code & ID Display", points: 2, sanction: "Written Warning" },
+            { id: "2023-08812-CDM", name: "Kevin Ramos", program: "BSIT 3-C", offense: "Article 9.1: Unauthorized Room Entry", points: 5, sanction: "4 Hours Community Service" },
+            { id: "2022-03144-CDM", name: "Patricia Lopez", program: "BSED 4-A", offense: "Article 3.1: Minor Classroom Disturbance", points: 1, sanction: "Verbal Admonition" }
+        ];
+
+        // Global State
+        let currentUser = null; // null represents Anonymous Guest
+
+        function getCases() {
+            const data = localStorage.getItem('safetrack_cases');
+            if (!data) {
+                localStorage.setItem('safetrack_cases', JSON.stringify(INITIAL_RECORDS));
+                return INITIAL_RECORDS;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveCases(cases) {
+            localStorage.setItem('safetrack_cases', JSON.stringify(cases));
+        }
+
+        function getVaultKeys() {
+            const keys = localStorage.getItem('safetrack_vault_keys');
+            return keys ? JSON.parse(keys) : ["ST-8291-CDM"];
+        }
+
+        function addVaultKey(key) {
+            const keys = getVaultKeys();
+            if (!keys.includes(key)) {
+                keys.unshift(key);
+                localStorage.setItem('safetrack_vault_keys', JSON.stringify(keys));
+            }
+            updateVaultUI();
+        }
+
+        // ==============================================================
+        // SPLASH SCREEN CONTROLLER
+        // ==============================================================
+        function initSplash() {
+            const splash = document.getElementById('splash-screen');
+            const pBar = document.getElementById('splash-progress-bar');
+            const pText = document.getElementById('splash-status-text');
+            const pPct = document.getElementById('splash-percent');
+
+            setTimeout(() => {
+                pBar.style.width = '65%';
+                pText.innerText = 'Verifying RA 10627 Anti-Bullying Protocol...';
+                pPct.innerText = '65%';
+            }, 500);
+
+            setTimeout(() => {
+                pBar.style.width = '100%';
+                pText.innerText = 'Portal Ready. Zero-trace active.';
+                pPct.innerText = '100%';
+            }, 1200);
+
+            setTimeout(() => {
+                dismissSplash();
+            }, 1800);
+        }
+
+        function dismissSplash() {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 700);
+        }
+
+        // ==============================================================
+        // AUTHENTICATION & ROLE SWITCHING (STUDENT vs ADMIN UI)
+        // ==============================================================
+        function openDemoSwitcherModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function loginAs(roleKey) {
+            if (roleKey === 'guest') {
+                currentUser = null;
+                showToast("Switched to 100% Anonymous Guest Mode", "info");
+            } else {
+                currentUser = DUMMY_ACCOUNTS[roleKey];
+                showToast(`Logged in as ${currentUser.name} (${currentUser.role})`, "success");
+            }
+            closeLoginModal();
+            syncAppViewWithRole();
+        }
+
+        function handleManualLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            
+            if (email.includes('prefect')) {
+                loginAs('prefect');
+            } else if (email.includes('guidance')) {
+                loginAs('guidance');
+            } else if (email.includes('admin')) {
+                loginAs('admin');
+            } else {
+                loginAs('student');
+            }
+        }
+
+        function handleAdminRoleSwitch(roleValue) {
+            loginAs(roleValue);
+        }
+
+        function logout() {
+            currentUser = null;
+            showToast("Logged out to Anonymous Student SafeSpace", "info");
+            syncAppViewWithRole();
+        }
+
+        function syncAppViewWithRole() {
+            const studentPortal = document.getElementById('student-portal-wrapper');
+            const adminPortal = document.getElementById('admin-portal-wrapper');
+            const studentMobileNav = document.getElementById('student-mobile-nav');
+            const headerViewBadge = document.getElementById('header-view-badge');
+            const authHeaderSlot = document.getElementById('auth-header-slot');
+            const studentAuthBanner = document.getElementById('student-auth-banner');
+
+            if (!currentUser || currentUser.role === 'STUDENT') {
+                // ==========================
+                // STUDENT VIEW ACTIVE
+                // ==========================
+                studentPortal.classList.remove('hidden');
+                adminPortal.classList.add('hidden');
+                studentMobileNav.classList.remove('hidden');
+
+                headerViewBadge.innerText = "Student SafeSpace";
+                headerViewBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wide";
+
+                if (currentUser && currentUser.role === 'STUDENT') {
+                    // Logged in student
+                    studentAuthBanner.classList.remove('hidden');
+                    studentAuthBanner.classList.add('flex');
+                    document.getElementById('banner-student-name').innerText = currentUser.name;
+                    document.getElementById('banner-student-sub').innerText = `${currentUser.program} • ${currentUser.id}`;
+                    document.getElementById('banner-student-avatar').src = currentUser.avatar;
+
+                    authHeaderSlot.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <img src="${currentUser.avatar}" class="w-8 h-8 rounded-full border border-emerald-400 object-cover">
+                            <button onclick="logout()" class="text-xs text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700 font-semibold">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    // Prefill student ID in identified form
+                    document.getElementById('student_id').value = currentUser.id;
+                    document.getElementById('student_email').value = currentUser.email;
+                } else {
+                    // Anonymous guest
+                    studentAuthBanner.classList.add('hidden');
+                    studentAuthBanner.classList.remove('flex');
+
+                    authHeaderSlot.innerHTML = `
+                        <button onclick="openDemoSwitcherModal()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span>Sign In</span>
+                        </button>
+                    `;
+                }
+
+                updateVaultUI();
+            } else {
+                // ==========================
+                // ADMIN COMMAND CENTER ACTIVE
+                // ==========================
+                studentPortal.classList.add('hidden');
+                adminPortal.classList.remove('hidden');
+                studentMobileNav.classList.add('hidden');
+
+                headerViewBadge.innerText = currentUser.dept;
+                headerViewBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wide";
+
+                document.getElementById('admin-badge-role').innerText = currentUser.badge;
+                document.getElementById('admin-welcome-title').innerText = `${currentUser.name}`;
+
+                // Select matching dropdown
+                if (currentUser.role === 'ADMIN_PREFECT') document.getElementById('admin-role-fast-switch').value = 'prefect';
+                if (currentUser.role === 'ADMIN_GUIDANCE') document.getElementById('admin-role-fast-switch').value = 'guidance';
+                if (currentUser.role === 'SUPER_ADMIN') document.getElementById('admin-role-fast-switch').value = 'admin';
+
+                authHeaderSlot.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <img src="${currentUser.avatar}" class="w-8 h-8 rounded-full border border-cdmGold object-cover">
+                        <button onclick="logout()" title="Logout to Student View" class="text-xs text-amber-200 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Exit Admin</span>
+                        </button>
+                    </div>
+                `;
+
+                renderAdminMetrics();
+                renderAdminTable();
+                renderDemeritsTable();
+                renderGuidanceDesk();
+            }
+        }
+
+        function goToHome() {
+            if (!currentUser || currentUser.role === 'STUDENT') {
+                switchStudentTab('student-report');
+            } else {
+                switchAdminTab('admin-cases');
+            }
+        }
+
+        // ==============================================================
+        // STUDENT PORTAL NAVIGATION
+        // ==============================================================
+        function switchStudentTab(tabId) {
+            document.querySelectorAll('.student-tab-pane').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Desktop Buttons
+            document.querySelectorAll('.student-nav-btn').forEach(btn => {
+                btn.classList.remove('bg-cdmGreen', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+            const activeDesktopBtn = document.getElementById(`tab-btn-${tabId}`);
+            if (activeDesktopBtn) {
+                activeDesktopBtn.classList.add('bg-cdmGreen', 'text-white', 'shadow-sm');
+                activeDesktopBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+            }
+
+            // Mobile Bottom Nav Buttons
+            const map = {
+                'student-report': 'mob-btn-report',
+                'student-track': 'mob-btn-track',
+                'student-vault': 'mob-btn-vault',
+                'student-policy': 'mob-btn-policy'
+            };
+            document.querySelectorAll('#student-mobile-nav button').forEach(btn => {
+                btn.classList.remove('text-cdmGreen', 'font-bold');
+                btn.classList.add('text-slate-400');
+            });
+            const activeMobBtn = document.getElementById(map[tabId]);
+            if (activeMobBtn) {
+                activeMobBtn.classList.add('text-cdmGreen', 'font-bold');
+                activeMobBtn.classList.remove('text-slate-400');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleStudentFields(show) {
+            const container = document.getElementById('verified-fields');
+            if (show) {
+                container.classList.remove('hidden');
+                container.classList.add('grid');
+                document.getElementById('student_id').required = true;
+            } else {
+                container.classList.add('hidden');
+                container.classList.remove('grid');
+                document.getElementById('student_id').required = false;
+            }
+        }
+
+        function updateRoutingBadge() {
+            const category = document.getElementById('incident_category').value;
+            const badge = document.getElementById('routing-badge');
+            
+            if (category.includes('Bullying')) {
+                badge.innerHTML = '<span class="text-purple-700 font-bold"><i class="fa-solid fa-heart-pulse mr-1"></i> Routed to: Guidance & Counseling Office (RA 10627 Desk)</span>';
+                badge.className = "h-[46px] flex items-center px-3.5 bg-purple-50 border border-purple-200 rounded-xl text-xs";
+            } else if (category.includes('Handbook')) {
+                badge.innerHTML = '<span class="text-blue-700 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i> Routed to: Office of the Prefect of Discipline</span>';
+                badge.className = "h-[46px] flex items-center px-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs";
+            } else {
+                badge.innerHTML = '<span class="text-slate-700 font-bold"><i class="fa-solid fa-building mr-1"></i> Routed to: Office of Student Affairs & Services</span>';
+                badge.className = "h-[46px] flex items-center px-3.5 bg-slate-100 border border-slate-200 rounded-xl text-xs";
+            }
+        }
+
+        function showFileName(input) {
+            const display = document.getElementById('file-name-display');
+            if (input.files.length > 0) {
+                display.innerHTML = `<i class="fa-solid fa-check-circle"></i> Attached: <strong>${input.files[0].name}</strong> (EXIF Scrubber Verified)`;
+            }
+        }
+
+        // ==============================================================
+        // CASE SUBMISSION & GENERATION ROUTINE
+        // ==============================================================
+        function generateCrockfordKey() {
+            const chars = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+            let part1 = "";
+            let part2 = "";
+            for (let i = 0; i < 4; i++) part1 += chars.charAt(Math.floor(Math.random() * chars.length));
+            for (let i = 0; i < 4; i++) part2 += chars.charAt(Math.floor(Math.random() * chars.length));
+            return `ST-${part1}-CDM`;
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const category = document.getElementById('incident_category').value;
+            const mode = document.querySelector('input[name="reporting_mode"]:checked').value;
+            const key = generateCrockfordKey();
+
+            let dept = "Office of Student Affairs";
+            if (category.includes('Bullying')) dept = "Guidance and Counseling Office";
+            if (category.includes('Handbook')) dept = "Office of the Prefect of Discipline";
+
+            const newCase = {
+                key: key,
+                category: category,
+                dept: dept,
+                mode: mode,
+                studentId: mode === 'identified' ? document.getElementById('student_id').value : null,
+                studentEmail: mode === 'identified' ? document.getElementById('student_email').value : null,
+                date: document.getElementById('incident_date').value,
+                location: document.getElementById('incident_location').value,
+                desc: document.getElementById('incident_description').value,
+                status: "Submitted",
+                remarks: "Incident intake registered under RA 10173 & RA 10627 protocols. Queued for 24-hour administrative triage.",
+                messages: []
+            };
+
+            const allCases = getCases();
+            allCases.unshift(newCase);
+            saveCases(allCases);
+
+            // Store in student's local vault
+            addVaultKey(key);
+
+            // Show Confirmation Modal
+            document.getElementById('modal-token-display').innerText = key;
+            document.getElementById('token-modal').classList.remove('hidden');
+
+            // Reset form
+            document.getElementById('incident-form').reset();
+            document.getElementById('file-name-display').innerText = "";
+            toggleStudentFields(false);
+            updateRoutingBadge();
+        }
+
+        function closeTokenModal() {
+            const key = document.getElementById('modal-token-display').innerText;
+            document.getElementById('token-modal').classList.add('hidden');
+            switchStudentTab('student-track');
+            document.getElementById('search-token').value = key;
+            performSearch();
+        }
+
+        function copyTokenToClipboard() {
+            const key = document.getElementById('modal-token-display').innerText;
+            navigator.clipboard.writeText(key);
+            showToast("Case Key copied to clipboard!", "success");
+        }
+
+        // ==============================================================
+        // TELEMETRY LIVE TRACKER & TWO-WAY MESSAGING
+        // ==============================================================
+        let activeQueriedCase = null;
+
+        function performSearch(forcedKey) {
+            const token = (forcedKey || document.getElementById('search-token').value).trim().toUpperCase();
+            if (!token) return;
+
+            document.getElementById('search-token').value = token;
+            const allCases = getCases();
+            const found = allCases.find(c => c.key === token);
+
+            const resultCard = document.getElementById('search-result-card');
+            const noResult = document.getElementById('no-result');
+
+            if (!found) {
+                resultCard.classList.add('hidden');
+                noResult.classList.remove('hidden');
+                activeQueriedCase = null;
+                return;
+            }
+
+            activeQueriedCase = found;
+            noResult.classList.add('hidden');
+            resultCard.classList.remove('hidden');
+
+            document.getElementById('res-key').innerText = found.key;
+            document.getElementById('res-category').innerText = found.category;
+            document.getElementById('res-dept').innerText = found.dept;
+            document.getElementById('res-desc').innerText = `"${found.desc}"`;
+            document.getElementById('res-remarks').innerText = found.remarks;
+
+            // Badges
+            const badge = document.getElementById('res-badge');
+            badge.innerText = found.status;
+            if (found.status === 'Resolved') {
+                badge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300";
+            } else if (found.status === 'In Mediation') {
+                badge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300";
+            } else {
+                badge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-300";
+            }
+
+            // Stepper Highlight Logic
+            const steps = ["Submitted", "Under Review", "In Mediation", "Resolved"];
+            const currentStepIdx = steps.indexOf(found.status);
+
+            for (let i = 1; i <= 4; i++) {
+                const node = document.getElementById(`step-${i}`);
+                const circle = node.querySelector('.step-circle');
+                if (i - 1 <= currentStepIdx) {
+                    circle.classList.remove('bg-slate-200', 'text-slate-600');
+                    circle.classList.add('bg-cdmGreen', 'text-white', 'scale-110');
+                } else {
+                    circle.classList.add('bg-slate-200', 'text-slate-600');
+                    circle.classList.remove('bg-cdmGreen', 'text-white', 'scale-110');
+                }
+            }
+
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            if (!activeQueriedCase) return;
+            const container = document.getElementById('res-chat-thread');
+            const messages = activeQueriedCase.messages || [];
+
+            if (messages.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 italic text-center py-2">No messages exchanged yet. You may post a clarification below.</p>`;
+                return;
+            }
+
+            container.innerHTML = messages.map(m => `
+                <div class="flex flex-col ${m.sender === 'STUDENT' ? 'items-end' : 'items-start'}">
+                    <span class="text-[9px] font-bold ${m.sender === 'STUDENT' ? 'text-cdmGreen' : 'text-purple-700'} mb-0.5">
+                        ${m.sender === 'STUDENT' ? 'You (Reporter)' : 'Official Investigator'}
+                    </span>
+                    <div class="p-2.5 rounded-xl max-w-[85%] ${m.sender === 'STUDENT' ? 'bg-cdmGreen text-white' : 'bg-white border border-slate-200 text-slate-800 shadow-sm'}">
+                        ${m.text}
+                    </div>
+                </div>
+            `).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendStudentReply() {
+            const input = document.getElementById('chat-reply-input');
+            const text = input.value.trim();
+            if (!text || !activeQueriedCase) return;
+
+            if (!activeQueriedCase.messages) activeQueriedCase.messages = [];
+            activeQueriedCase.messages.push({
+                sender: 'STUDENT',
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            const allCases = getCases();
+            const idx = allCases.findIndex(c => c.key === activeQueriedCase.key);
+            if (idx !== -1) {
+                allCases[idx] = activeQueriedCase;
+                saveCases(allCases);
+            }
+
+            input.value = '';
+            renderChatMessages();
+            showToast("Clarification transmitted securely", "success");
+        }
+
+        function updateVaultUI() {
+            const vaultList = document.getElementById('vault-list');
+            const countBadge = document.getElementById('vault-count-badge');
+            const mobDot = document.getElementById('mob-vault-dot');
+            const keys = getVaultKeys();
+            const allCases = getCases();
+
+            countBadge.innerText = keys.length;
+            if (keys.length > 0) mobDot.classList.remove('hidden');
+
+            if (keys.length === 0) {
+                vaultList.innerHTML = `<p class="text-slate-400 p-4 text-center">No keys registered yet on this device.</p>`;
+                return;
+            }
+
+            vaultList.innerHTML = keys.map(k => {
+                const record = allCases.find(c => c.key === k);
+                const status = record ? record.status : "Active";
+                const cat = record ? record.category : "Incident Case";
+                return `
+                    <div class="py-3 flex justify-between items-center">
+                        <div>
+                            <span class="font-mono font-bold text-navyBlue text-xs">${k}</span>
+                            <span class="text-[11px] text-slate-500 block">${cat}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${status}</span>
+                            <button onclick="queryFromVault('${k}')" class="px-2.5 py-1 rounded bg-navyBlue text-white text-[11px] font-bold hover:bg-slate-800 transition">
+                                Track
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function queryFromVault(key) {
+            switchStudentTab('student-track');
+            performSearch(key);
+        }
+
+        // ==============================================================
+        // ADMIN COMMAND CENTER & ROLE IMPLEMENTATION
+        // ==============================================================
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.admin-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                b.classList.remove('bg-navyBlue', 'text-white', 'shadow');
+                b.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            if (tabId === 'admin-cases') {
+                document.getElementById('pane-admin-cases').classList.remove('hidden');
+                document.getElementById('btn-admin-cases').classList.add('bg-navyBlue', 'text-white', 'shadow');
+            } else if (tabId === 'admin-demerits') {
+                document.getElementById('pane-admin-demerits').classList.remove('hidden');
+                document.getElementById('btn-admin-demerits').classList.add('bg-navyBlue', 'text-white', 'shadow');
+            } else if (tabId === 'admin-guidance-desk') {
+                document.getElementById('pane-admin-guidance-desk').classList.remove('hidden');
+                document.getElementById('btn-admin-guidance').classList.add('bg-navyBlue', 'text-white', 'shadow');
+            }
+        }
+
+        function renderAdminMetrics() {
+            const allCases = getCases();
+            document.getElementById('stat-total-cases').innerText = allCases.length;
+            document.getElementById('stat-pending-cases').innerText = allCases.filter(c => c.status === 'Submitted' || c.status === 'Under Review').length;
+            document.getElementById('stat-active-hearings').innerText = allCases.filter(c => c.status === 'In Mediation').length;
+            document.getElementById('stat-resolved-cases').innerText = allCases.filter(c => c.status === 'Resolved').length;
+        }
+
+        function renderAdminTable() {
+            const filterDept = document.getElementById('admin-dept-filter').value;
+            const filterStatus = document.getElementById('admin-status-filter').value;
+            const searchQuery = (document.getElementById('admin-search-input').value || '').toLowerCase();
+            const allCases = getCases();
+
+            const tbody = document.getElementById('admin-table-body');
+            const mobileCardList = document.getElementById('admin-mobile-card-list');
+            tbody.innerHTML = '';
+            mobileCardList.innerHTML = '';
+
+            let filtered = allCases;
+            if (filterDept !== 'ALL') filtered = filtered.filter(c => c.dept === filterDept);
+            if (filterStatus !== 'ALL') filtered = filtered.filter(c => c.status === filterStatus);
+            if (searchQuery) {
+                filtered = filtered.filter(c => 
+                    c.key.toLowerCase().includes(searchQuery) ||
+                    c.category.toLowerCase().includes(searchQuery) ||
+                    c.location.toLowerCase().includes(searchQuery) ||
+                    c.desc.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No incident tickets match the selected criteria.</td></tr>`;
+                mobileCardList.innerHTML = `<p class="p-6 text-center text-slate-400 text-xs">No incident tickets found.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                // Desktop Row
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-4 font-mono font-bold text-navyBlue">${item.key}</td>
+                    <td class="p-4 max-w-xs">
+                        <span class="font-bold text-slate-800 block">${item.category}</span>
+                        <span class="text-slate-500 truncate block text-[11px]">${item.desc}</span>
+                        <span class="text-[10px] text-slate-400"><i class="fa-solid fa-location-dot"></i> ${item.location}</span>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.dept.includes('Guidance') ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                            ${item.dept.includes('Guidance') ? 'Guidance Office' : 'Prefect of Discipline'}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.mode === 'anonymous' ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 text-emerald-800'}">
+                            ${item.mode === 'anonymous' ? '100% ANONYMOUS' : (item.studentId || 'VERIFIED')}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${item.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' : item.status === 'In Mediation' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="openAdminModal('${item.key}')" class="px-3 py-1.5 bg-navyBlue hover:bg-slate-800 text-white rounded-lg text-[11px] font-bold transition">
+                            Triage / Resolve
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+                // Mobile Responsive Card
+                const card = document.createElement('div');
+                card.className = "bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-mono font-bold text-navyBlue text-xs">${item.key}</span>
+                            <span class="text-[10px] font-bold block ${item.dept.includes('Guidance') ? 'text-purple-700' : 'text-blue-700'}">${item.dept}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${item.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
+                            ${item.status}
+                        </span>
+                    </div>
+                    <p class="text-xs font-semibold text-slate-800">${item.category}</p>
+                    <p class="text-[11px] text-slate-500 line-clamp-2">${item.desc}</p>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-100">
+                        <span class="text-[10px] font-bold text-slate-400">${item.mode === 'anonymous' ? '🕵️ Anonymous' : '🆔 ' + item.studentId}</span>
+                        <button onclick="openAdminModal('${item.key}')" class="px-3 py-1 bg-navyBlue text-white rounded-lg text-xs font-bold">
+                            Triage
+                        </button>
+                    </div>
+                `;
+                mobileCardList.appendChild(card);
+            });
+        }
+
+        function renderDemeritsTable() {
+            const tbody = document.getElementById('demerits-table-body');
+            tbody.innerHTML = INITIAL_DEMERITS.map(d => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-mono font-bold text-navyBlue">${d.id}</td>
+                    <td class="p-3 font-bold text-slate-800">${d.name}</td>
+                    <td class="p-3 text-slate-600">${d.program}</td>
+                    <td class="p-3 text-slate-700">${d.offense}</td>
+                    <td class="p-3 font-bold text-amber-600">+${d.points} Demerits</td>
+                    <td class="p-3 font-semibold text-red-700">${d.sanction}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderGuidanceDesk() {
+            const container = document.getElementById('guidance-confidential-cases');
+            const allCases = getCases().filter(c => c.category.includes('Bullying'));
+
+            if (allCases.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 p-4 text-center">No active bullying cases under mediation.</p>`;
+                return;
+            }
+
+            container.innerHTML = allCases.map(c => `
+                <div class="p-4 rounded-xl border border-purple-200 bg-purple-50/40 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-purple-900">${c.key}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-200 text-purple-800 uppercase">RA 10627 Protected</span>
+                        </div>
+                        <p class="text-xs text-slate-700 mt-1 font-medium">${c.desc}</p>
+                        <p class="text-[10px] text-purple-900 mt-1"><strong>Action Plan:</strong> ${c.remarks}</p>
+                    </div>
+                    <button onclick="openAdminModal('${c.key}')" class="px-3 py-1.5 bg-purple-800 hover:bg-purple-900 text-white rounded-lg text-xs font-bold shadow-sm">
+                        Conduct Mediation
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        let currentModalCase = null;
+
+        function openAdminModal(key) {
+            const allCases = getCases();
+            const item = allCases.find(c => c.key === key);
+            if (!item) return;
+
+            currentModalCase = item;
+            document.getElementById('edit-case-key').value = item.key;
+            document.getElementById('modal-case-header-key').innerText = `Case Key: ${item.key} • Category: ${item.category}`;
+            document.getElementById('edit-case-status').value = item.status;
+            document.getElementById('edit-case-dept').value = item.dept;
+            document.getElementById('edit-case-remarks').value = item.remarks;
+            document.getElementById('admin-action-modal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-action-modal').classList.add('hidden');
+        }
+
+        function sendAdminRelayMessage() {
+            const input = document.getElementById('admin-reply-input');
+            const text = input.value.trim();
+            if (!text || !currentModalCase) return;
+
+            if (!currentModalCase.messages) currentModalCase.messages = [];
+            currentModalCase.messages.push({
+                sender: 'INVESTIGATOR',
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            const allCases = getCases();
+            const idx = allCases.findIndex(c => c.key === currentModalCase.key);
+            if (idx !== -1) {
+                allCases[idx] = currentModalCase;
+                saveCases(allCases);
+            }
+
+            input.value = '';
+            showToast("Relay message transmitted to student's tracker", "success");
+        }
+
+        function saveAdminAction() {
+            const key = document.getElementById('edit-case-key').value;
+            const newStatus = document.getElementById('edit-case-status').value;
+            const newDept = document.getElementById('edit-case-dept').value;
+            const newRemarks = document.getElementById('edit-case-remarks').value;
+
+            const allCases = getCases();
+            const idx = allCases.findIndex(c => c.key === key);
+            if (idx !== -1) {
+                allCases[idx].status = newStatus;
+                allCases[idx].dept = newDept;
+                allCases[idx].remarks = newRemarks;
+                saveCases(allCases);
+            }
+
+            closeAdminModal();
+            renderAdminMetrics();
+            renderAdminTable();
+            renderGuidanceDesk();
+            showToast("Case committed & timeline updated", "success");
+        }
+
+        // ==============================================================
+        // TOAST NOTIFICATIONS
+        // ==============================================================
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colorClass = type === 'success' 
+                ? 'bg-cdmGreen text-white' 
+                : type === 'warning' ? 'bg-amber-500 text-white' : 'bg-navyDark text-white';
+
+            toast.className = `p-3.5 rounded-xl shadow-xl flex items-center space-x-2 text-xs font-bold ${colorClass} slide-up pointer-events-auto border border-white/20`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'}"></i>
+                <span class="flex-grow">${message}</span>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.4s ease';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initSplash();
+            syncAppViewWithRole();
+        });
+    </script>
+</body>
+</html>
